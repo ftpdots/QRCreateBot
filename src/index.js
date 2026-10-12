@@ -30,6 +30,27 @@ const texts = {
 
 Send any text or link, and I'll turn it into a QR code.`,
 
+  about: `QR Generator
+
+A simple bot that turns text and links into QR codes.
+
+Send a message, get an image back. No forms, no extra steps. The code is ready to scan, save or share right away.
+
+Use it for links, notes, contact details or anything else you want to pass on quickly.
+
+Need the list of commands? Send /help.`,
+
+  help: `How to use
+
+Send any text or link, and the bot will reply with a QR code.
+
+Commands:
+/start - start the bot
+/about - about the bot
+/help - show this message
+
+Support: @ftpdot`,
+
   error: "Something has gone wrong. Please try again",
 };
 
@@ -58,6 +79,16 @@ bot.command("start", safe("command_start", async (ctx) => {
     caption: texts.start(ctx),
   });
   log("info", "command_start", { userId: ctx.from.id });
+}));
+
+bot.command("help", safe("command_help", async (ctx) => {
+  await ctx.reply(texts.help);
+  log("info", "command_help", { userId: ctx.from.id });
+}));
+
+bot.command("about", safe("command_about", async (ctx) => {
+  await ctx.reply(texts.about);
+  log("info", "command_about", { userId: ctx.from.id });
 }));
 
 // Startup
