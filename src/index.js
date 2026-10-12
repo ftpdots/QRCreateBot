@@ -21,11 +21,34 @@ if (!token) {
   process.exit(1);
 }
 
+// Texts
+const texts = {
+  error: "Something has gone wrong. Please try again",
+};
+
 // Bot
 
 const bot = new Bot(token);
 
+function safe(event, handler) {
+  return async (ctx) => {
+    try {
+      await handler(ctx);
+    } catch (error) {
+      log("error", event, {
+        userId: ctx.from?.id,
+        error: error.message,
+      });
+      await ctx.reply(texts.error);
+    }
+  };
+}
+
 // Startup
+
+bot.catch((err) => {
+  log("error", "unhandled_error", { error: err.message });
+});
 
 bot.start({
   onStart: () => log("info", "bot_started"),
