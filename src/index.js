@@ -70,6 +70,7 @@ Support: @ftpdot`,
 
   error: "Something has gone wrong. Please try again",
   tooLong: `Text is too long. Maximum is ${maxLength} characters.`,
+  unsupported: "Unsupported format. Send text or a link.",
 };
 
 // Keyboards
@@ -151,6 +152,11 @@ bot.on("message:text", safe("send_text", async (ctx) => {
   const qr = await QRCode.toBuffer(text);
   await ctx.replyWithPhoto(new InputFile(qr, "qr.png"));
   log("info", "send_text", { userId: ctx.from.id, text });
+}));
+
+bot.on("message", safe("unsupported_format", async (ctx) => {
+  await ctx.reply(texts.unsupported);
+  log("error", "unsupported_format", { userId: ctx.from.id });
 }));
 
 // Startup
