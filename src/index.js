@@ -165,6 +165,16 @@ bot.catch((err) => {
   log("error", "unhandled_error", { error: err.message });
 });
 
+bot.api
+  .setMyCommands([
+    { command: "start", description: "Start the bot" },
+    { command: "help", description: "How to use the bot" },
+    { command: "about", description: "About the bot" },
+  ])
+  .catch((error) => {
+    log("error", "set_commands_failed", { error: error.message });
+  });
+
 bot.start({
   onStart: () => log("info", "bot_started"),
 });
