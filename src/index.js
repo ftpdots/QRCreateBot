@@ -1,5 +1,6 @@
 const path = require("path");
 const { Bot, InputFile } = require("grammy");
+const QRCode = require("qrcode");
 require("dotenv").config();
 
 // Logger
@@ -89,6 +90,16 @@ bot.command("help", safe("command_help", async (ctx) => {
 bot.command("about", safe("command_about", async (ctx) => {
   await ctx.reply(texts.about);
   log("info", "command_about", { userId: ctx.from.id });
+}));
+
+// Messages
+
+bot.on("message:text", safe("send_text", async (ctx) => {
+  const text = ctx.message.text;
+
+  const qr = await QRCode.toBuffer(text);
+  await ctx.replyWithPhoto(new InputFile(qr, "qr.png"));
+  log("info", "send_text", { userId: ctx.from.id, text });
 }));
 
 // Startup
