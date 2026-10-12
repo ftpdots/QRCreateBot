@@ -1,4 +1,5 @@
-const { Bot } = require("grammy");
+const path = require("path");
+const { Bot, InputFile } = require("grammy");
 require("dotenv").config();
 
 // Logger
@@ -21,8 +22,14 @@ if (!token) {
   process.exit(1);
 }
 
+const welcomeImage = path.join(__dirname, "../assets/welcome.png");
+
 // Texts
 const texts = {
+  start: (ctx) => `Hello, ${ctx.from.first_name}!
+
+Send any text or link, and I'll turn it into a QR code.`,
+
   error: "Something has gone wrong. Please try again",
 };
 
@@ -43,6 +50,15 @@ function safe(event, handler) {
     }
   };
 }
+
+// Commands
+
+bot.command("start", safe("command_start", async (ctx) => {
+  await ctx.replyWithPhoto(new InputFile(welcomeImage), {
+    caption: texts.start(ctx),
+  });
+  log("info", "command_start", { userId: ctx.from.id });
+}));
 
 // Startup
 
