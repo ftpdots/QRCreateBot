@@ -17,9 +17,15 @@ function log(level, event, data = {}) {
 // Config
 
 const token = process.env.BOT_TOKEN;
+const maxLength = Number(process.env.MAX_LENGTH);
 
 if (!token) {
   log("error", "token_not_found");
+  process.exit(1);
+}
+
+if (!Number.isInteger(maxLength) || maxLength <= 0) {
+  log("error", "max_length_not_found");
   process.exit(1);
 }
 
@@ -53,6 +59,7 @@ Commands:
 Support: @ftpdot`,
 
   error: "Something has gone wrong. Please try again",
+  tooLong: `Text is too long. Maximum is ${maxLength} characters.`,
 };
 
 // Bot
@@ -96,6 +103,12 @@ bot.command("about", safe("command_about", async (ctx) => {
 
 bot.on("message:text", safe("send_text", async (ctx) => {
   const text = ctx.message.text;
+
+  if (text.length > maxLength) {
+    await ctx.reply(texts.tooLong);
+    log("error", "max_length_exceeded", { userId: ctx.from.id });
+    return;
+  }
 
   const qr = await QRCode.toBuffer(text);
   await ctx.replyWithPhoto(new InputFile(qr, "qr.png"));
