@@ -1,5 +1,5 @@
 const path = require("path");
-const { Bot, InputFile } = require("grammy");
+const { Bot, InputFile, InlineKeyboard } = require("grammy");
 const QRCode = require("qrcode");
 require("dotenv").config();
 
@@ -37,6 +37,16 @@ const texts = {
 
 Send any text or link, and I'll turn it into a QR code.`,
 
+  qr: `Create QR
+
+Send a message with the content you want to encode, and the bot will reply with a QR code.
+
+Supported:
+- Plain text
+- Links
+
+Maximum length: ${maxLength} characters.`,
+
   about: `QR Generator
 
 A simple bot that turns text and links into QR codes.
@@ -62,6 +72,13 @@ Support: @ftpdot`,
   tooLong: `Text is too long. Maximum is ${maxLength} characters.`,
 };
 
+// Keyboards
+
+const startKeyboard = new InlineKeyboard()
+  .text("Create QR", "qr").row()
+  .text("About", "about")
+  .text("Help", "help");
+
 // Bot
 
 const bot = new Bot(token);
@@ -85,6 +102,7 @@ function safe(event, handler) {
 bot.command("start", safe("command_start", async (ctx) => {
   await ctx.replyWithPhoto(new InputFile(welcomeImage), {
     caption: texts.start(ctx),
+    reply_markup: startKeyboard,
   });
   log("info", "command_start", { userId: ctx.from.id });
 }));
@@ -97,6 +115,26 @@ bot.command("help", safe("command_help", async (ctx) => {
 bot.command("about", safe("command_about", async (ctx) => {
   await ctx.reply(texts.about);
   log("info", "command_about", { userId: ctx.from.id });
+}));
+
+// Buttons
+
+bot.callbackQuery("qr", safe("button_qr", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await ctx.reply(texts.qr);
+  log("info", "button_qr", { userId: ctx.from.id });
+}));
+
+bot.callbackQuery("about", safe("button_about", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await ctx.reply(texts.about);
+  log("info", "button_about", { userId: ctx.from.id });
+}));
+
+bot.callbackQuery("help", safe("button_help", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await ctx.reply(texts.help);
+  log("info", "button_help", { userId: ctx.from.id });
 }));
 
 // Messages
